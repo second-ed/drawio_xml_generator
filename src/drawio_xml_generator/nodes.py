@@ -1,7 +1,7 @@
-from datetime import datetime
 import logging.config
 import os
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from typing import List
 
 import attr
@@ -94,7 +94,7 @@ class DrawioXMLGenerator:
 
     def add_node(self, node: NetworkNode) -> bool:
         if node.node_type not in SHAPE_ICONS:
-            logging.error(f"node_type: {node.node_type} not implemented")            
+            logging.error(f"node_type: {node.node_type} not implemented")
 
         try:
             mxCell = ET.SubElement(

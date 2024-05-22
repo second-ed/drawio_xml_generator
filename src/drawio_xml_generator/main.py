@@ -1,8 +1,12 @@
 import logging
 import logging.config
 
-from drawio_xml_generator.nodes import DrawioXMLGenerator, NetworkLink, NetworkNode
 from drawio_xml_generator.config import Config
+from drawio_xml_generator.nodes import (
+    DrawioXMLGenerator,
+    NetworkLink,
+    NetworkNode,
+)
 
 Config().set_filepath("./configs/example_config.yaml")
 logging.config.fileConfig(
