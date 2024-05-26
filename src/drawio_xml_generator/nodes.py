@@ -152,6 +152,7 @@ class DrawioXMLGenerator:
             )
             mxGeometry = ET.SubElement(mxCell, "mxGeometry")
             mxGeometry.set("as", "geometry")
+            logger.debug(f"added link: {link}")
             return True
         except Exception as e:
             logger.error(e)
