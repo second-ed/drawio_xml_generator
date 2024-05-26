@@ -1,4 +1,3 @@
-import logging.config
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -7,14 +6,17 @@ from typing import List
 import attr
 from attr.validators import instance_of
 
-from drawio_xml_generator.config import Config
+from drawio_xml_generator.config import (
+    Config,
+    get_dir_path,
+    get_logger,
+    setup_logger,
+)
 from drawio_xml_generator.constants import SHAPE_ICONS
 
-Config().set_filepath("./configs/example_config.yaml")
-logging.config.fileConfig(
-    "./logging.ini", defaults={"root": Config().logs_folder}
-)
-logger = logging.getLogger(__name__)
+Config().set_filepath(get_dir_path(__file__, 2, "configs/example_config.yaml"))
+setup_logger(__file__, 2)
+logger = get_logger(__name__)
 
 
 @attr.define
@@ -91,10 +93,11 @@ class DrawioXMLGenerator:
         self.mxCellID1 = ET.SubElement(
             self.root, "mxCell", id="1", parent="0", style=";html=1;"
         )
+        logger.info("xml initialised")
 
     def add_node(self, node: NetworkNode) -> bool:
         if node.node_type not in SHAPE_ICONS:
-            logging.error(f"node_type: {node.node_type} not implemented")
+            logger.error(f"node_type: {node.node_type} not implemented")
 
         try:
             mxCell = ET.SubElement(
@@ -122,10 +125,10 @@ class DrawioXMLGenerator:
             )
             mxGeometry.set("as", "geometry")
             self.ids[node.name] = node
-            logging.debug(f"added node: {node}")
+            logger.debug(f"added node: {node}")
             return True
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             return False
 
     def add_list_nodes(self, nodes: List[NetworkNode]):
@@ -151,7 +154,7 @@ class DrawioXMLGenerator:
             mxGeometry.set("as", "geometry")
             return True
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             return False
 
     def add_list_links(self, links: List[NetworkLink]) -> bool:

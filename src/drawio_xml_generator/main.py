@@ -1,18 +1,18 @@
-import logging
-import logging.config
-
-from drawio_xml_generator.config import Config
+from drawio_xml_generator.config import (
+    Config,
+    get_dir_path,
+    get_logger,
+    setup_logger,
+)
 from drawio_xml_generator.nodes import (
     DrawioXMLGenerator,
     NetworkLink,
     NetworkNode,
 )
 
-Config().set_filepath("./configs/example_config.yaml")
-logging.config.fileConfig(
-    "./logging.ini", defaults={"root": Config().logs_folder}
-)
-logger = logging.getLogger(__name__)
+Config().set_filepath(get_dir_path(__file__, 2, "configs/example_config.yaml"))
+setup_logger(__file__, 2)
+logger = get_logger(__name__)
 
 
 nodes = [
