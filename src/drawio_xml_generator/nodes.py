@@ -24,12 +24,22 @@ class NetworkNode:
     name: str = attr.ib(validator=[instance_of(str)])
     ip: str = attr.ib(validator=[instance_of(str)])
     node_type: str = attr.ib(validator=[instance_of(str)])
+    x: int = attr.ib(default=0, validator=[instance_of(int)], converter=int)
+    y: int = attr.ib(default=0, validator=[instance_of(int)], converter=int)
+    display_name: str = attr.ib(validator=[instance_of(str)], init=False)
+
+    
+    def __attrs_post_init__(self):
+        self.generate_display_name()
+
+    def generate_display_name(self):
+        self.display_name = self.name.replace("_", " ") + "\n" + self.ip
 
 
 @attr.define
 class NetworkLink:
-    src: str = attr.ib(validator=[instance_of(str)])
-    dst: str = attr.ib(validator=[instance_of(str)])
+    src_node: NetworkNode = attr.ib(validator=[instance_of(NetworkNode)])
+    dst_node: NetworkNode = attr.ib(validator=[instance_of(NetworkNode)])
 
 
 @attr.define
@@ -51,6 +61,8 @@ class DrawioXMLGenerator:
         validator=[instance_of(ET.Element)], init=False
     )
     ids: dict = attr.ib(default={}, validator=[instance_of(dict)])
+    nodes: list = attr.ib(default=[], validator=[instance_of(list)])
+    links: list = attr.ib(default=[], validator=[instance_of(list)])
 
     def __attrs_post_init__(self) -> None:
         self.xml_init()
@@ -103,8 +115,8 @@ class DrawioXMLGenerator:
             mxCell = ET.SubElement(
                 self.root,
                 "mxCell",
-                id=node.name,
-                value=node.name,
+                id=node.display_name,
+                value=node.display_name,
                 style=(
                     "verticalLabelPosition=bottom;"
                     "html=1;"
@@ -124,8 +136,11 @@ class DrawioXMLGenerator:
                 height=SHAPE_ICONS[node.node_type]["height"],
             )
             mxGeometry.set("as", "geometry")
-            self.ids[node.name] = node
+            mxGeometry.set("x", str(node.x))
+            mxGeometry.set("y", str(node.y))
+            self.ids[node.display_name] = node
             logger.debug(f"added node: {node}")
+            self.nodes.append(f"    {node.name}")
             return True
         except Exception as e:
             logger.error(e)
@@ -143,16 +158,19 @@ class DrawioXMLGenerator:
             mxCell = ET.SubElement(
                 self.root,
                 "mxCell",
-                id=link.src + link.dst,
+                id=link.src_node.display_name+ link.dst_node.display_name,
                 style="endFill=0;endArrow=none;",
                 parent="1",
-                source=link.src,
-                target=link.dst,
+                source=link.src_node.display_name,
+                target=link.dst_node.display_name,
                 edge="1",
             )
             mxGeometry = ET.SubElement(mxCell, "mxGeometry")
             mxGeometry.set("as", "geometry")
             logger.debug(f"added link: {link}")
+            self.links.append(
+                f"    {link.src_node.name} - {link.dst_node.name}"
+            )
             return True
         except Exception as e:
             logger.error(e)
@@ -179,3 +197,9 @@ class DrawioXMLGenerator:
 
     def __repr__(self) -> str:
         return str(self.display_xml())
+
+    def get_sketch(self) -> str:
+        result = "nodes:\n"
+        result += "\n".join(self.nodes) + "\n\n"
+        result += "links:\n" + "\n".join(self.links)
+        return result

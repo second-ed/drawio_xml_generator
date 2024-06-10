@@ -1004,6 +1004,11 @@ SHAPE_ICONS = {
         "width": "80",
         "height": "75",
     },
+    "sensor": {
+        "shape": "mxgraph.aws3.sensor;fillColor=#036897;gradientColor=none;",
+        "width": "76.5",
+        "height": "90",
+    },
     "server_switch": {
         "shape": "mxgraph.cisco.switches.server_switch;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;",
         "width": "56",
