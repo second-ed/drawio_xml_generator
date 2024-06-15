@@ -166,3 +166,5 @@ dmypy.json
 cython_debug/
 
 outputs/
+refs.py
+Untitled Diagram.drawio.xml
